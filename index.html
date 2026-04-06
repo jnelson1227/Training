@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Highwater Café — Menu Knowledge Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --salmon:    #F15F53;
+    --navy:      #234156;
+    --baby-blue: #8FCBCC;
+    --cream:     #FFF7E7;
+    --navy-light: #2e5570;
+    --salmon-dark: #d44b40;
+    --green:     #3D9B6A;
+    --text:      #1a2e3b;
+    --card-bg:   #ffffff;
+    --border:    rgba(35,65,86,0.10);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--navy);
+    padding: 36px 24px 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: -40px;
+    background:
+      radial-gradient(ellipse at 20% 60%, rgba(143,203,204,0.18) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 30%, rgba(241,95,83,0.10) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  .header-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.30em;
+    text-transform: uppercase;
+    color: var(--baby-blue);
+    margin-bottom: 8px;
+    font-weight: 500;
+    position: relative;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 44px);
+    color: #fff;
+    font-weight: 700;
+    line-height: 1.15;
+    position: relative;
+  }
+  .header h1 em {
+    color: var(--baby-blue);
+    font-style: italic;
+  }
+  .header-sub {
+    color: rgba(255,255,255,0.52);
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.04em;
+    margin-top: 10px;
+    position: relative;
+  }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap {
+    background: var(--navy);
+    padding: 0 24px 22px;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 7px;
+    letter-spacing: 0.04em;
+  }
+  .progress-bar-bg {
+    background: rgba(255,255,255,0.12);
+    border-radius: 99px;
+    height: 5px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--baby-blue), var(--salmon));
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.45s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── CATEGORY PILL ── */
+  .category-banner {
+    background: var(--baby-blue);
+    color: var(--navy);
+    text-align: center;
+    padding: 9px 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+  }
+
+  /* ── QUIZ BODY ── */
+  .quiz-body {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 28px 20px 80px;
+  }
+
+  /* ── QUESTION CARD ── */
+  .question-card {
+    background: var(--card-bg);
+    border-radius: 14px;
+    padding: 28px 28px 22px;
+    box-shadow: 0 2px 12px rgba(35,65,86,0.08), 0 0 0 1px var(--border);
+    animation: slideIn 0.3s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes slideIn {
+    from { opacity:0; transform: translateY(14px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .question-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--salmon);
+    margin-bottom: 12px;
+  }
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(17px, 3vw, 22px);
+    font-weight: 700;
+    color: var(--navy);
+    line-height: 1.4;
+    margin-bottom: 24px;
+  }
+
+  /* ── ANSWER OPTIONS ── */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .option-btn {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    background: #f8f9fa;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14.5px;
+    color: var(--text);
+    text-align: left;
+    transition: all 0.18s ease;
+    width: 100%;
+    line-height: 1.45;
+  }
+  .option-btn:hover:not(:disabled) {
+    background: #eef7f7;
+    border-color: var(--baby-blue);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(143,203,204,0.20);
+  }
+  .option-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border-radius: 50%;
+    background: rgba(35,65,86,0.08);
+    color: var(--navy);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0;
+    margin-top: 1px;
+  }
+  .option-btn.correct {
+    background: #e8f7ef;
+    border-color: var(--green);
+    color: #1a3d2b;
+  }
+  .option-btn.correct .option-letter {
+    background: var(--green);
+    color: #fff;
+  }
+  .option-btn.incorrect {
+    background: #fdecea;
+    border-color: var(--salmon);
+    color: #6e1c17;
+  }
+  .option-btn.incorrect .option-letter {
+    background: var(--salmon);
+    color: #fff;
+  }
+  .option-btn.revealed-correct {
+    background: #e8f7ef;
+    border-color: var(--green);
+    opacity: 0.75;
+  }
+  .option-btn.revealed-correct .option-letter {
+    background: var(--green);
+    color: #fff;
+  }
+  .option-btn:disabled { cursor: default; transform: none !important; }
+
+  /* ── FEEDBACK BOX ── */
+  .feedback {
+    margin-top: 18px;
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 14px;
+    line-height: 1.55;
+    display: none;
+    animation: fadeIn 0.25s ease;
+  }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+  .feedback.correct-fb {
+    background: #e8f7ef;
+    border-left: 4px solid var(--green);
+    color: #1a3d2b;
+    display: block;
+  }
+  .feedback.incorrect-fb {
+    background: #fdecea;
+    border-left: 4px solid var(--salmon);
+    color: #6e1c17;
+    display: block;
+  }
+  .feedback strong { display: block; margin-bottom: 4px; font-weight: 600; font-size: 13px; letter-spacing: 0.02em; }
+
+  /* ── NAV BUTTON ── */
+  .nav-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+  }
+  .next-btn {
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 13px 28px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.18s ease, transform 0.15s ease;
+    display: none;
+  }
+  .next-btn:hover { background: var(--navy-light); transform: translateY(-1px); }
+  .next-btn.visible { display: inline-block; }
+
+  /* ── SCORE SCREEN ── */
+  .score-screen {
+    display: none;
+    text-align: center;
+    padding: 40px 20px 80px;
+    max-width: 600px;
+    margin: 0 auto;
+    animation: slideIn 0.4s ease;
+  }
+  .score-screen.active { display: block; }
+  .score-badge {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--navy);
+    margin: 0 auto 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 8px rgba(35,65,86,0.12);
+  }
+  .score-badge .score-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 34px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+  }
+  .score-badge .score-denom {
+    font-size: 12px;
+    color: var(--baby-blue);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+  }
+  .score-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    color: var(--navy);
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .score-subtitle {
+    font-size: 15px;
+    color: rgba(35,65,86,0.65);
+    line-height: 1.6;
+    margin-bottom: 32px;
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .pct-bar-wrap {
+    background: rgba(35,65,86,0.08);
+    border-radius: 99px;
+    height: 8px;
+    margin-bottom: 32px;
+    overflow: hidden;
+  }
+  .pct-bar {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--baby-blue), var(--navy));
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+  .restart-btn {
+    background: var(--salmon);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 36px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.18s ease;
+  }
+  .restart-btn:hover { background: var(--salmon-dark); }
+
+  /* ── INTRO SCREEN ── */
+  .intro-screen {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 36px 20px 80px;
+  }
+  .intro-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 36px 32px;
+    box-shadow: 0 2px 16px rgba(35,65,86,0.08), 0 0 0 1px var(--border);
+  }
+  .intro-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    color: var(--navy);
+    margin-bottom: 14px;
+  }
+  .intro-card p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(35,65,86,0.75);
+    margin-bottom: 14px;
+  }
+  .intro-topics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 20px 0 28px;
+  }
+  .intro-topic {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--navy);
+    font-weight: 500;
+  }
+  .intro-topic span {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(35,65,86,0.55);
+    margin-top: 2px;
+  }
+  .start-btn {
+    background: var(--navy);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 36px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    width: 100%;
+    transition: background 0.18s ease;
+  }
+  .start-btn:hover { background: var(--navy-light); }
+
+  /* ── UTILITIES ── */
+  .hidden { display: none !important; }
+  .quiz-section { display: none; }
+  .quiz-section.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-eyebrow">Highwater Café &amp; Market · Staff Training</div>
+  <h1>Menu <em>Knowledge</em> Quiz</h1>
+  <div class="header-sub">Spring 2026 — Register Readiness</div>
+</div>
+
+<!-- PROGRESS (hidden until quiz starts) -->
+<div class="progress-wrap" id="progressWrap" style="display:none;">
+  <div class="progress-meta">
+    <span id="progressLabel">Question 1 of 30</span>
+    <span id="progressPct">0%</span>
+  </div>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progressFill"></div>
+  </div>
+</div>
+
+<!-- CATEGORY BANNER -->
+<div class="category-banner hidden" id="categoryBanner">Food Menu</div>
+
+<!-- INTRO SCREEN -->
+<div class="intro-screen" id="introScreen">
+  <div class="intro-card">
+    <h2>Welcome, New Team Member!</h2>
+    <p>This quiz covers what you need to know to confidently work the register at Highwater. You'll be tested on our food menu, coffee drinks, and seasonal spring offerings.</p>
+    <p>You don't need to memorize prices or every syrup flavor — focus on knowing the menu well enough to find items in the POS and answer guest questions accurately.</p>
+    <div class="intro-topics">
+      <div class="intro-topic">🥪 Food Menu<span>Sandwiches, salads, breakfasts, sides &amp; combos</span></div>
+      <div class="intro-topic">☕ Coffee Menu<span>Espresso drinks, frappes, cold drinks</span></div>
+      <div class="intro-topic">🌸 Seasonal Drinks<span>Spring 2026 specials &amp; seasonal milkshakes</span></div>
+      <div class="intro-topic">🧾 Register Skills<span>POS navigation, add-ons, modifications</span></div>
+    </div>
+    <button class="start-btn" onclick="startQuiz()">Start Quiz →</button>
+  </div>
+</div>
+
+<!-- QUIZ AREA -->
+<div class="quiz-body hidden" id="quizArea">
+  <div class="question-card" id="questionCard">
+    <div class="question-label" id="questionLabel">Question 1 of 30</div>
+    <div class="question-text" id="questionText"></div>
+    <div class="options" id="optionsContainer"></div>
+    <div class="feedback" id="feedbackBox"></div>
+  </div>
+  <div class="nav-row">
+    <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next Question →</button>
+  </div>
+</div>
+
+<!-- SCORE SCREEN -->
+<div class="score-screen" id="scoreScreen">
+  <div class="score-badge">
+    <div class="score-num" id="scoreFinal">0</div>
+    <div class="score-denom" id="scoreDenom">/ 30</div>
+  </div>
+  <div class="score-title" id="scoreTitle">Nice Work!</div>
+  <div class="score-subtitle" id="scoreSubtitle"></div>
+  <div class="pct-bar-wrap"><div class="pct-bar" id="pctBar"></div></div>
+  <button class="restart-btn" onclick="restartQuiz()">Try Again</button>
+</div>
+
+<script>
+const questions = [
+
+  // ══════════════════════════════════════════
+  //  CATEGORY 1 — HOT SANDWICHES
+  // ══════════════════════════════════════════
+  {
+    category: "🥪 Hot Sandwiches",
+    q: "What bread does the Caprese Melt come on?",
+    options: ["Sourdough","Brioche bun","House focaccia","Everything bagel"],
+    answer: 2,
+    explanation: "The Caprese Melt is served open face on house focaccia — it's an important detail since guests sometimes expect regular bread."
+  },
+  {
+    category: "🥪 Hot Sandwiches",
+    q: "A guest asks what comes on the Oregon Albacore Tuna Melt. What cheeses should you tell them?",
+    options: ["Pepperjack and sharp cheddar","Tillamook sharp cheddar and provolone","Gruyere and fontina","Fresh mozzarella and provolone"],
+    answer: 1,
+    explanation: "The Tuna Melt uses Tillamook sharp cheddar and provolone, served on toasted sourdough. The Fishpatrick albacore tuna salad is the protein."
+  },
+  {
+    category: "🥪 Hot Sandwiches",
+    q: "What makes the 3 Cheese Bacon Jam Burger different from the Bacon Cheeseburger?",
+    options: ["It uses a different meat patty","It uses three specialty cheeses (fontina, gruyere, gouda) and house bacon jam","It's served on focaccia instead of a brioche bun","It comes with a side included in the price"],
+    answer: 1,
+    explanation: "The 3 Cheese Bacon Jam Burger features fontina, gruyere, and gouda plus house-made bacon jam, vs. the Bacon Cheeseburger's Tillamook sharp cheddar. Both are on toasted brioche buns and both can be doubled for +$5 or subbed to Impossible for +$3."
+  },
+  {
+    category: "🥪 Hot Sandwiches",
+    q: "What is the Grilled Cheese/Tomato Soup combo?",
+    options: ["Half a grilled cheese with a bowl of soup","Melty Tillamook sharp cheddar and provolone on buttered sourdough, with house made tomato basil soup","Sourdough grilled cheese with a cup of salmon chowder","Two eggs, cheese, and bacon on sourdough with a cup of soup"],
+    answer: 1,
+    explanation: "It's Tillamook sharp cheddar and provolone on buttered sourdough paired with house made tomato basil soup. A guest-favorite combo lunch!"
+  },
+
+  // ══════════════════════════════════════════
+  //  CATEGORY 2 — COLD SANDWICHES
+  // ══════════════════════════════════════════
+  {
+    category: "🥪 Cold Sandwiches",
+    q: "Which cold sandwich is served on toasted sourdough or multigrain bread?",
+    options: ["Chicken Avocado","Bluebird","BLTA","Local Tuna on Croissant"],
+    answer: 2,
+    explanation: "The BLTA (bacon, lettuce, tomato, avocado, mayo) lets the guest choose between toasted sourdough or multigrain. Make sure to ask when ringing it in!"
+  },
+  {
+    category: "🥪 Cold Sandwiches",
+    q: "What is the Bluebird sandwich?",
+    options: ["Roasted chicken, blueberry chutney, bacon, provolone, mayo, and lettuce on house focaccia","Crispy chicken, blue cheese, avocado on sourdough","Roasted chicken, pesto mayo, provolone on focaccia","Albacore tuna with mayo and apple on a croissant"],
+    answer: 0,
+    explanation: "The Bluebird is one of the more unique sandwiches — the blueberry chutney and provolone combo on focaccia is a guest favorite. Don't confuse it with the Chicken Avocado."
+  },
+  {
+    category: "🥪 Cold Sandwiches",
+    q: "The Local Tuna on Croissant — which brand of tuna do we use?",
+    options: ["StarKist","Bumblebee","Fishpatrick albacore","Pacific Catch Co."],
+    answer: 2,
+    explanation: "We use Fishpatrick albacore tuna for both the Local Tuna on Croissant and the Oregon Albacore Tuna Melt. Guests often ask about the source — it's a local Oregon product."
+  },
+
+  // ══════════════════════════════════════════
+  //  CATEGORY 3 — BREAKFAST
+  // ══════════════════════════════════════════
+  {
+    category: "🍳 Breakfast",
+    q: "What is the Highwater Hashwich served on?",
+    options: ["Toasted sourdough","Two air fried hash brown patties","A butter toasted bun","An Asiago bagel"],
+    answer: 1,
+    explanation: "The Hashwich is bacon jam, egg, and Tillamook sharp cheddar sandwiched between two air fried hash brown patties. It's also GF!"
+  },
+  {
+    category: "🍳 Breakfast",
+    q: "A guest orders the Big Breakfast Burrito. What's in it?",
+    options: ["Eggs, bacon, cheese, roasted potatoes in a tortilla","Three eggs, sausage, roasted potatoes, onions, red pepper, and pepperjack in a toasted tortilla","Eggs, avocado, bacon jam, and cheddar in a flour tortilla","Three eggs, ham, sharp cheddar, and hash browns in a tortilla"],
+    answer: 1,
+    explanation: "The Big Breakfast Burrito has three eggs, sausage, roasted potatoes, onions, red pepper, and pepperjack in a toasted tortilla. Note that it's marked as a 'spring special' item — it's back on the menu!"
+  },
+  {
+    category: "🍳 Breakfast",
+    q: "What distinguishes the Highwater Deluxe from a regular breakfast sandwich?",
+    options: ["It's served all day and uses an Asiago bagel","It features house sausage, bacon jam, egg, onion, Tillamook sharp, and spicy mayo on a butter toasted bun","It comes with a side of hash browns included","It's made with three eggs and a double meat portion"],
+    answer: 1,
+    explanation: "The Highwater Deluxe is house sausage, bacon jam, egg, onion, Tillamook sharp, and spicy mayo on a butter toasted bun. It's priced to order as one or two (two for $14.95)."
+  },
+  {
+    category: "🍳 Breakfast",
+    q: "Which of these breakfast items is marked as Gluten Free (GF)?",
+    options: ["Breakfast Grilled Cheese","Avocado Toast","Highwater Hashwich","Asiago Bagel Sandwich"],
+    answer: 2,
+    explanation: "The Highwater Hashwich is GF because it uses hash brown patties instead of bread. The Avocado Toast is on multigrain, the Breakfast Grilled Cheese is on sourdough, and the Asiago Bagel is obviously not GF."
+  },
+  {
+    category: "🍳 Breakfast",
+    q: "Can guests add hash brown patties to other menu items?",
+    options: ["No, hash browns are only on the Hashwich","Yes — guests can add two air fried hash brown patties to any item for $2.95","Yes, but only to breakfast items","Only with manager approval"],
+    answer: 1,
+    explanation: "Guests can add two air fried hash brown patties to ANY item for $2.95. It's a popular add-on — know where to find it in the POS."
+  },
+
+  // ══════════════════════════════════════════
+  //  CATEGORY 4 — SALADS
+  // ══════════════════════════════════════════
+  {
+    category: "🥗 Salads",
+    q: "Which salad is described as Vegan and GF?",
+    options: ["Harvest Salad","Classic Cobb","Asian Chop","Cowboy Salad"],
+    answer: 2,
+    explanation: "The Asian Chop salad is both Vegan and GF — shredded cabbage, carrot, red pepper, jalapeño, edamame, and sugared cashews with ginger peanut dressing. Guests can add chicken ($5) or grilled shrimp ($6)."
+  },
+  {
+    category: "🥗 Salads",
+    q: "What protein options can be added to salads?",
+    options: ["Roast chicken only","Roast chicken ($5), grilled shrimp ($6), or avocado ($3)","Bacon or avocado","Grilled salmon or grilled chicken"],
+    answer: 1,
+    explanation: "The three add-ons available for salads are: Roast Chicken $5, Grilled Shrimp $6, and Avocado $3. Know these for the POS!"
+  },
+  {
+    category: "🥗 Salads",
+    q: "The Classic Cobb Salad is marked GF. What dressing choices does it come with?",
+    options: ["Ranch or honey mustard","House lemon vinaigrette or ranch","Classic red wine vinaigrette or ranch","Caesar or balsamic"],
+    answer: 2,
+    explanation: "The Classic Cobb comes with a choice of classic red wine vinaigrette or ranch. Always ask the guest! The Harvest Salad comes with the house lemon vinaigrette (no choice)."
+  },
+  {
+    category: "🥗 Salads",
+    q: "What does the Cowboy Salad come with that makes it unique?",
+    options: ["It's served in a bread bowl","It's topped with Honey BBQ Fritos and has a creamy chipotle dressing","It comes with a free beer","It's topped with poached eggs"],
+    answer: 1,
+    explanation: "The Cowboy Salad has crispy chicken, pepperjack, black beans, corn, red onion, cherry tomatoes, creamy chipotle dressing — and Honey BBQ Fritos on top. Avocado can be added for $3."
+  },
+
+  // ══════════════════════════════════════════
+  //  CATEGORY 5 — SOUPS & LIGHT ITEMS
+  // ══════════════════════════════════════════
+  {
+    category: "🍲 Soups & Light Items",
+    q: "Which of our house soups are GF?",
+    options: ["Neither soup is GF","Tomato Basil only","Smoked Salmon Chowder only","Both the Tomato Basil and the Smoked Salmon Chowder are GF"],
+    answer: 3,
+    explanation: "Both of our house soups — the Tomato Basil and the Smoked Salmon Chowder — are GF. This is a common guest question for folks with dietary restrictions."
+  },
+  {
+    category: "🍲 Soups & Light Items",
+    q: "A guest asks what's in the Smoked Salmon Chowder. What do you tell them?",
+    options: ["Cream base with Dungeness crab and potatoes","Wild pacific salmon, bacon, potatoes, and lots of veggies","Salmon, cream, dill, and capers in a broth base","Smoked salmon with a Manhattan-style tomato base"],
+    answer: 1,
+    explanation: "The Smoked Salmon Chowder is wild pacific salmon, bacon, potatoes, and lots of veggies. It comes in a cup or bowl."
+  },
+  {
+    category: "🍲 Soups & Light Items",
+    q: "What is the Make It a Combo option on the menu?",
+    options: ["Any entrée with a cup of soup and a salad","Add a big cookie and a fountain soda, iced tea, or lemonade for $4","Any sandwich with chips and a drink for $6","Soup and half sandwich combo for a discounted price"],
+    answer: 1,
+    explanation: "The combo add-on is: add a big cookie and a fountain soda, iced tea, or lemonade for $4. Find this in the POS as a modifier."
+  },
+
+  // ══════════════════════════════════════════
+  //  CATEGORY 6 — COMBO LUNCHES / SIDES
+  // ══════════════════════════════════════════
+  {
+    category: "🧾 Sides & Combos",
+    q: "Hot sandwiches served all day come with a choice of side. Which of these is NOT one of the listed side options?",
+    options: ["Coleslaw","Mac salad","Kettle chips","French fries"],
+    answer: 3,
+    explanation: "We do NOT serve french fries! The sides for hot sandwiches are: coleslaw, mac salad, kettle chips, cup of soup (+$3), small salad of choice (+$4), or Pacific Smoked Salmon Chowder (+$5). Know these cold — guests ask constantly."
+  },
+  {
+    category: "🧾 Sides & Combos",
+    q: "What is the Pacific Catch Combo?",
+    options: ["A grilled salmon fillet with coleslaw and mac salad","Half of the Oregon Albacore Tuna Melt and a cup of Smoked Salmon Chowder","A cup of salmon chowder with a side of focaccia","A daily catch fish sandwich with chips"],
+    answer: 1,
+    explanation: "The Pacific Catch Combo is half of the Oregon Albacore Tuna Melt and a cup of the Pacific Smoked Salmon Chowder. Guests can upgrade to a bowl for an additional $3."
+  },
+
+  // ══════════════════════════════════════════
+  //  CATEGORY 7 — SPRING SPECIAL
+  // ══════════════════════════════════════════
+  {
+    category: "🌟 Spring Special",
+    q: "What is our Spring 2026 special item?",
+    options: ["Bluebird Sandwich","Bang Bang Shrimp Tacos","Cowboy Salad","Big Breakfast Burrito"],
+    answer: 1,
+    explanation: "The Bang Bang Shrimp Tacos are the Spring 2026 special! Three white corn tortillas with sweet and spicy air fried bang bang shrimp, Asian slaw, mango, cilantro, and green onion. They are also GF."
+  },
+  {
+    category: "🌟 Spring Special",
+    q: "Are the Bang Bang Shrimp Tacos gluten free?",
+    options: ["No, the bang bang sauce contains gluten","Yes — they are marked GF on the menu","Only if requested without the sauce","They can be modified to be GF"],
+    answer: 1,
+    explanation: "The Bang Bang Shrimp Tacos are marked GF on the menu — they come on white corn tortillas. If a guest asks about GF options, this is one to know."
+  },
+
+  // ══════════════════════════════════════════
+  //  CATEGORY 8 — COFFEE MENU
+  // ══════════════════════════════════════════
+  {
+    category: "☕ Coffee & Espresso",
+    q: "All espresso drinks come with how many shots by default?",
+    options: ["Single shot","Double shot","Triple shot","It depends on the size"],
+    answer: 1,
+    explanation: "All espresso drinks at Highwater come standard with a double shot. Guests can add an extra shot for $1.75 (hot) or $2.75 (iced). Know this — guests often ask."
+  },
+  {
+    category: "☕ Coffee & Espresso",
+    q: "What is the Coastal Fog?",
+    options: ["An iced lavender latte","Smith Tea Lord Bergamot tea with house vanilla and steamed milk","A cold brew coffee with oat milk","An iced chai with vanilla and honey"],
+    answer: 1,
+    explanation: "The Coastal Fog is a Smith Tea Lord Bergamot (Earl Grey-style) with our house vanilla syrup and steamed milk. It's on the coffee menu — not a coffee drink, but a specialty tea latte."
+  },
+  {
+    category: "☕ Coffee & Espresso",
+    q: "A guest wants 'the Calico.' What is in it?",
+    options: ["Cold brew with caramel and chocolate drizzle","White frappe base, espresso, chocolate and caramel drizzle, house vanilla whipped cream","Iced mocha with caramel sauce and coconut milk","Espresso, white chocolate, caramel, and steamed milk"],
+    answer: 1,
+    explanation: "The Calico is a signature frappe: white frappe base with espresso, chocolate drizzle, caramel drizzle, and house vanilla whipped cream. It's on the regular coffee menu (not seasonal)."
+  },
+  {
+    category: "☕ Coffee & Espresso",
+    q: "Which of these is NOT a non-dairy milk option at Highwater?",
+    options: ["Oat milk","Coconut milk","Almond milk","Soy milk"],
+    answer: 3,
+    explanation: "We carry oat, coconut, and almond milk — but NOT soy milk. If a guest requests soy, let them know our non-dairy options. Each alt milk is an upcharge."
+  },
+  {
+    category: "☕ Coffee & Espresso",
+    q: "What is the difference between the Caramel Macchiato and the Iced Salted Caramel Latte?",
+    options: ["They are the same drink, just one is hot","The Macchiato has espresso over milk and vanilla with caramel drizzle; the Iced Salted Caramel Latte has espresso, milk, and salted caramel sauce over ice","The Macchiato uses more espresso shots","The Iced Salted Caramel Latte has whipped cream"],
+    answer: 1,
+    explanation: "The Caramel Macchiato is espresso over milk with house vanilla and caramel drizzle (can be hot or iced). The Iced Salted Caramel Latte is a separate drink — espresso, milk, and salted caramel sauce over ice. Different flavor profile!"
+  },
+
+  // ══════════════════════════════════════════
+  //  CATEGORY 9 — SEASONAL DRINKS
+  // ══════════════════════════════════════════
+  {
+    category: "🌸 Seasonal Drinks",
+    q: "Which seasonal milkshake uses peppermint and Oreos?",
+    options: ["Cherry Chocolate Chip Milkshake","Lucky Mint Oreo Milkshake","Strawberry Cream Shake","Mint Chip Dream Shake"],
+    answer: 1,
+    explanation: "The Lucky Mint Oreo Milkshake is vanilla soft serve blended with house-made green peppermint syrup and Oreos, topped with vanilla whipped cream and more Oreos. A fun spring offering!"
+  },
+  {
+    category: "🌸 Seasonal Drinks",
+    q: "What is in the Peach Iced Tea?",
+    options: ["Brewed peach tea with honey","House made Smith iced tea with peach syrup, served over ice","Arnold Palmer with peach juice","Peach lemonade with black tea"],
+    answer: 1,
+    explanation: "The Peach Iced Tea is our regular Smith iced tea combined with peach syrup, served over ice. It's a simple and popular spring drink."
+  },
+
+  // ══════════════════════════════════════════
+  //  CATEGORY 10 — POS & REGISTER SKILLS
+  // ══════════════════════════════════════════
+  {
+    category: "🧾 Register & POS Skills",
+    q: "A guest orders an Avocado Toast and asks if they can get it as a half order. What do you tell them?",
+    options: ["No, Avocado Toast only comes as a full order","Yes — a half order is available and should be in the POS","Yes, but only with manager approval","Only available as a half order at breakfast time"],
+    answer: 1,
+    explanation: "Both the Avocado Toast and the Caprese Melt have a half-order option listed on the menu. Make sure you know where to find the half-order modifier in the POS."
+  },
+  {
+    category: "🧾 Register & POS Skills",
+    q: "A guest orders a burger and wants to substitute an Impossible patty. How does that work?",
+    options: ["Impossible substitutions are not available","It's a $3 upcharge — available on both burgers","It's free of charge on the Bacon Cheeseburger only","It replaces the patty at no cost but must be approved by the kitchen"],
+    answer: 1,
+    explanation: "Both the Bacon Cheeseburger and the 3 Cheese Bacon Jam Burger offer an Impossible patty substitution for +$3. Find this modifier in the POS — it's a common modification."
+  },
+
+];
+
+// ── STATE ──
+let current = 0;
+let score = 0;
+let answered = false;
+
+function startQuiz() {
+  document.getElementById('introScreen').classList.add('hidden');
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('categoryBanner').classList.remove('hidden');
+  document.getElementById('quizArea').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = questions[current];
+  const total = questions.length;
+
+  // Progress
+  const pct = Math.round((current / total) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `Question ${current + 1} of ${total}`;
+  document.getElementById('progressPct').textContent = pct + '%';
+
+  // Category banner
+  document.getElementById('categoryBanner').textContent = q.category;
+
+  // Question
+  document.getElementById('questionLabel').textContent = `Question ${current + 1} of ${total}`;
+  document.getElementById('questionText').textContent = q.q;
+
+  // Options
+  const container = document.getElementById('optionsContainer');
+  container.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.onclick = () => selectAnswer(i);
+    container.appendChild(btn);
+  });
+
+  // Feedback
+  const fb = document.getElementById('feedbackBox');
+  fb.className = 'feedback';
+  fb.innerHTML = '';
+
+  // Next btn
+  document.getElementById('nextBtn').classList.remove('visible');
+
+  // Animate card
+  const card = document.getElementById('questionCard');
+  card.style.animation = 'none';
+  card.offsetHeight; // reflow
+  card.style.animation = 'slideIn 0.3s cubic-bezier(.4,0,.2,1)';
+}
+
+function selectAnswer(chosen) {
+  if (answered) return;
+  answered = true;
+
+  const q = questions[current];
+  const btns = document.querySelectorAll('.option-btn');
+  const fb = document.getElementById('feedbackBox');
+
+  btns.forEach(b => b.disabled = true);
+
+  if (chosen === q.answer) {
+    score++;
+    btns[chosen].classList.add('correct');
+    fb.className = 'feedback correct-fb';
+    fb.innerHTML = `<strong>✓ Correct!</strong>${q.explanation}`;
+  } else {
+    btns[chosen].classList.add('incorrect');
+    btns[q.answer].classList.add('revealed-correct');
+    fb.className = 'feedback incorrect-fb';
+    fb.innerHTML = `<strong>✗ Not quite.</strong>${q.explanation}`;
+  }
+
+  document.getElementById('nextBtn').classList.add('visible');
+}
+
+function nextQuestion() {
+  current++;
+  if (current >= questions.length) {
+    showScore();
+  } else {
+    renderQuestion();
+  }
+}
+
+function showScore() {
+  document.getElementById('quizArea').classList.add('hidden');
+  document.getElementById('progressWrap').style.display = 'none';
+  document.getElementById('categoryBanner').classList.add('hidden');
+
+  const total = questions.length;
+  const pct = Math.round((score / total) * 100);
+
+  document.getElementById('scoreFinal').textContent = score;
+  document.getElementById('scoreDenom').textContent = '/ ' + total;
+
+  let title, subtitle;
+  if (pct >= 90) {
+    title = 'Ready for the Register!';
+    subtitle = `Outstanding! You scored ${pct}% — you clearly know the menu well. Review any missed questions with your manager and you're good to go.`;
+  } else if (pct >= 75) {
+    title = 'Good Foundation!';
+    subtitle = `You scored ${pct}% — solid work! Go back and review the categories you found tricky, then retake the quiz until you hit 90% or higher.`;
+  } else if (pct >= 60) {
+    title = 'Keep Practicing';
+    subtitle = `You scored ${pct}% — you're getting there! Spend some time with the physical menu and talk through it with your trainer before your next attempt.`;
+  } else {
+    title = 'More Study Needed';
+    subtitle = `You scored ${pct}% — don't worry, this is what training is for! Sit down with the menu with your manager and work through it together before retaking.`;
+  }
+
+  document.getElementById('scoreTitle').textContent = title;
+  document.getElementById('scoreSubtitle').textContent = subtitle;
+
+  const scoreScreen = document.getElementById('scoreScreen');
+  scoreScreen.classList.add('active');
+
+  setTimeout(() => {
+    document.getElementById('pctBar').style.width = pct + '%';
+  }, 100);
+}
+
+function restartQuiz() {
+  current = 0;
+  score = 0;
+  answered = false;
+  document.getElementById('scoreScreen').classList.remove('active');
+  document.getElementById('progressWrap').style.display = 'block';
+  document.getElementById('categoryBanner').classList.remove('hidden');
+  document.getElementById('quizArea').classList.remove('hidden');
+  renderQuestion();
+}
+</script>
+</body>
+</html>
